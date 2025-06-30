@@ -1,11 +1,21 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { IUsersRepository } from '../../../repositories/users/IUsersRepositories'
+import { CreateUserInput, createUserSchema } from '../../../schemas/user-schema'
+import {hash} from 'bcryptjs'
+import {v4 as uuidv4} from 'uuid'
+import { User } from '../../../entities/User'  
 
-export class CreateUserUsecase1750978127614 implements MigrationInterface {
+export class CreateUserUseCase{
+    constructor (private usersRepository: IUsersRepository) {}
+    async execute(input: CreateUserInput) {
+        const data = createUserSchema.parse(input)
 
-    public async up(queryRunner: QueryRunner): Promise<void> {
+        const existingEmail = await this.usersRepository.findByEmail(data.email) 
+        if(existingEmail) {
+            throw new Error('E-mail já cadastrado')
+        }
+        const existingPhone = await this.usersRepository.findByPhone(data.phone) 
+        if(existingPhone) {
+            throw new Error('Telefone já cadastrado')
+        }
+        }
     }
-
-    public async down(queryRunner: QueryRunner): Promise<void> {
-    }
-
-}
